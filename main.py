@@ -10,6 +10,8 @@ def TypeI(id, array, index):
   print ("aq")
 def TypeR(id, array, index):
   print("aq")
+def Typej(id, array, index):
+  print("aq")  
 
 if __name__ == '__main__':  
   L = 0
@@ -70,8 +72,22 @@ if __name__ == '__main__':
       TypeI(8, fileWords, index)   
     elif x == "addiu":
       TypeI(9, fileWords, index)
-    elif x == "bne":
-      TypeI(5, fileWords, index)    
+    elif x == "slti":
+      TypeI(10, fileWords, index)
+    elif x == "andi":
+      TypeI(12, fileWords, index)  
+    elif x == "ori":
+      TypeI(13, fileWords, index)     
+    elif x == "lui":
+      TypeI(15, fileWords, index)
+    elif x == "lw":
+      TypeI(35, fileWords, index)  
+    elif x == "sw":
+      TypeI(43, fileWords, index)
+    elif x == "j":
+      Typej(2, fileWords, index)
+    elif x == "jal":
+      Typej(3, fileWords, index)    
                    
         
 
