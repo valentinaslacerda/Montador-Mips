@@ -87,7 +87,7 @@ if __name__ == '__main__':
     elif x == "j":
       Typej(2, fileWords, index)
     elif x == "jal":
-      Typej(3, fileWords, index)   
+      Typej(3, fileWords, index)
                    
         
 
