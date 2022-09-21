@@ -1,19 +1,38 @@
+
+from array import array
 from cProfile import label
+from Utility import Util
+from bitarray import bitarray
+
 
 lineList = []
 labelLineList = {}
 labelList = []
 fileRows = []
 fileWords = []
+arrayR = []
+
+def TypeR(id, array, index):
+  if id == 2:
+    arrayR.append([0, 1, 1, 1, 0, 0 ])
+  else:
+    arrayR.append([0, 0, 0, 0, 0, 0 ])
+
+  i=0
+  while array[index+i] != 'bk':
+    mascara = bitarray('00000')
+    print(mascara) 
+    i+=1
+      
+
 
 def TypeI(id, array, index):
-  print ("aq")
-def TypeR(id, array, index):
   print("aq")
 def Typej(id, array, index):
   print("aq")  
 
 if __name__ == '__main__':  
+  util = Util()
   L = 0
   fileName = input("Nome do arquivo .asm: ")
   fileContent = open(fileName, 'r')
@@ -26,7 +45,9 @@ if __name__ == '__main__':
           labelList.append(word)
           labelLineList[word] = [L] 
     L+= 1
-
+    fileWords.append("bk")
+    
+  print(fileWords)
   for index, x in enumerate(fileWords):
     if x == "add":
       TypeR(32, fileWords, index)
