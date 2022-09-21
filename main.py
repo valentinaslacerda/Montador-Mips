@@ -12,23 +12,30 @@ fileRows = []
 fileWords = []
 arrayR = []
 
+def format32(bin):
+    r = len(bin)
+    a = 5 - r
+    
+    return ("0"*a)+bin
+    
 def TypeR(id, array, index):
   if id == 2:
     arrayR.append([0, 1, 1, 1, 0, 0 ])
+    
+    print(arrayR)
   else:
     arrayR.append([0, 0, 0, 0, 0, 0 ])
+    
+    print(arrayR)
 
   i=0
   
  #Adiciona todos os zeros que faltarem  
-  def format32(bin):
-    r = len(bin)
-    a = 32 - r
-    return ("0"*a)+bin
+  
 
 #chamada, passando para a função e tirando o 0b que fica aparecendo
-  format32(arrayR[2:])
-  format32(arrayR[2:])
+  
+
       
 
 
@@ -52,6 +59,7 @@ if __name__ == '__main__':
           labelLineList[word] = [L] 
     L+= 1
     fileWords.append("bk")
+  
     
   print(fileWords)
   for index, x in enumerate(fileWords):
