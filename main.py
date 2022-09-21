@@ -19,10 +19,16 @@ def TypeR(id, array, index):
     arrayR.append([0, 0, 0, 0, 0, 0 ])
 
   i=0
-  while array[index+i] != 'bk':
-    mascara = bitarray('00000')
-    print(mascara) 
-    i+=1
+  
+ #Adiciona todos os zeros que faltarem  
+  def format32(bin):
+    r = len(bin)
+    a = 32 - r
+    return ("0"*a)+bin
+
+#chamada, passando para a função e tirando o 0b que fica aparecendo
+  format32(arrayR[2:])
+  format32(arrayR[2:])
       
 
 
