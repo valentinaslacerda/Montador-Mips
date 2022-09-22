@@ -12,33 +12,35 @@ fileRows = []
 fileWords = []
 arrayR = []
 
-def format32(bin):
-    r = len(bin)
-    a = 5 - r
-    
-    return ("0"*a)+bin
     
 def TypeR(id, array, index):
-  if id == 2:
-    arrayR.append([0, 1, 1, 1, 0, 0 ])
+  destinations = []
+  if array[index] == "mul":
+    arrayR.append(28)
+
+    while array[index] != 'bk':
+      for x in util.registers:
+        if x == array[index]:
+          destinations.append(x)  
+      index += 1
     
-    print(arrayR)
   else:
-    arrayR.append([0, 0, 0, 0, 0, 0 ])
-    
-    print(arrayR)
+    arrayR.append(0)
+    print(array[index])
 
-  i=0
+    while array[index] != 'bk':
+      for x in util.registers:
+        if x == array[index]:
+          destinations.append(x)  
+      index += 1
+  arrayR.append(destinations[1])
+  arrayR.append(destinations[2])
+  arrayR.append(destinations[0]) 
+  arrayR.append(0)
+  arrayR.append(id)
+
+  print(arrayR)
   
- #Adiciona todos os zeros que faltarem  
-  
-
-#chamada, passando para a função e tirando o 0b que fica aparecendo
-  
-
-      
-
-
 def TypeI(id, array, index):
   print("aq")
 def Typej(id, array, index):
@@ -52,6 +54,7 @@ if __name__ == '__main__':
   for index, line in enumerate(fileContent):
     fileRows.append(line)
     for word in line.split():
+      word = word.replace(",", "")
       fileWords.append(word)
       for i in range(len(word)):
         if word[i] == ":": 
