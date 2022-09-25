@@ -2,8 +2,8 @@
 from array import array
 from cProfile import label
 from multiprocessing.dummy import current_process
+from turtle import clear
 from Utility import Util
-from bitarray import bitarray
 
 
 lineList = []
@@ -14,6 +14,7 @@ fileWords = []
 arrayR = []
 arrayI = []
 arrayJ = []
+binSave = []
 currentLine = 0
 
 def registrarChecker(array, index):
@@ -55,15 +56,12 @@ def registrarChecker3(array, index):
   while (len(labelList) - 1) >= i:
     if labelList[i][0] == immediate:
       labelAddress = labelList[i][1]
-      print('currentLine', currentLine)
-      print('labelAddress', labelAddress)
-      immediate = labelAddress - currentLine - 1
+      immediate = (labelAddress + 1) - currentLine - 1
       destinations.append(immediate)
       return destinations
     i+=1
 
   destinations.append(int(immediate))
-  print(destinations)
   return destinations
 
 def registrarCheckerLW_SW(array, index):
@@ -95,17 +93,23 @@ def toJump(array, index):
     index += 1
 
   while (len(labelList) - 1) >= i:
-    print(label)
-    print(labelList[i][0])
     if labelList[i][0] == label:
       labelAddress = labelList[i][1]
-      labelAddress = 0x00400000 + (labelAddress * 4)
+      labelAddress = (0x00400000 + (labelAddress * 4))/4
       destinations.append(labelAddress)
       return destinations
     i+=1
   
     
+def format32(bin):
+    r = len(bin)
+    a = 32 - r
+    return ("0"*a)+bin
 
+def negativeBin(n, bits):
+  s = bin(n & int("1"*bits, 2))[2:]
+
+  return ("{0:0>%s}" %(bits)).format(s)
     
 def TypeR(id, array, index):
   
@@ -117,6 +121,11 @@ def TypeR(id, array, index):
     arrayR.append(destinations[0]) 
     arrayR.append(0)
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
+    
   elif id == 0 or id == 2:
     arrayR.append(0)
     arrayR.append(0)
@@ -125,6 +134,10 @@ def TypeR(id, array, index):
     arrayR.append(destinations[0])
     arrayR.append(destinations[2])
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
   elif id == 8:
     arrayR.append(0)
     destinations = registrarChecker(array, index)
@@ -133,6 +146,10 @@ def TypeR(id, array, index):
     arrayR.append(0)
     arrayR.append(0)
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
   elif id == 16 or id == 18:
     arrayR.append(0)
     arrayR.append(0)
@@ -141,6 +158,10 @@ def TypeR(id, array, index):
     arrayR.append(destinations[0])
     arrayR.append(0)
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
   elif id == 24 or id == 25 or id == 26 or id == 27:
     arrayR.append(0)
     destinations = registrarChecker(array, index)
@@ -149,16 +170,24 @@ def TypeR(id, array, index):
     arrayR.append(0)
     arrayR.append(0)
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
 
   else:
     arrayR.append(0)
     destinations = registrarChecker(array, index)
-    print(destinations)
     arrayR.append(destinations[1])
     arrayR.append(destinations[2])
     arrayR.append(destinations[0]) 
     arrayR.append(0)
     arrayR.append(id)
+    binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayR.clear()
+
   
 
   
@@ -170,36 +199,54 @@ def TypeI(id, array, index):
     arrayI.append(destinations[0])
     arrayI.append(destinations[1])
     arrayI.append(destinations[2])
+    arrayI[3] = negativeBin(arrayI[3], 16)
+    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16))
+    binValue = binValue[2:15]+ arrayI[3]
+    binValue = format32(binValue)
+    binSave.append(binValue)
+    arrayI.clear()
+
   elif id == 8 or id == 9 or id == 10 or id == 11 or id == 12 or id == 13:
     arrayI.append(id)
     destinations = registrarChecker3(array, index)
     arrayI.append(destinations[1])
     arrayI.append(destinations[0])
     arrayI.append(destinations[2])
-    print(arrayI)
+    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16 | arrayI[3]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayI.clear()
   elif id == 15:
     arrayI.append(id)
     arrayI.append(0)
     destinations = registrarChecker3(array, index)
     arrayI.append(destinations[0])
     arrayI.append(destinations[1])
-    print(arrayI)
+    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16 | arrayI[3]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayI.clear()
   elif id == 35 or id == 43:
     arrayI.append(id) 
     destinations = registrarCheckerLW_SW(array, index)
     arrayI.append(destinations[2])
     arrayI.append(destinations[0])
     arrayI.append(destinations[1])
-    print(arrayI)
+    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16 | arrayI[3]))
+    binValue = format32(binValue[2:])
+    binSave.append(binValue)
+    arrayI.clear()
 
 
 def TypeJ(id, array, index):
    arrayJ.append(id)
    destinations = toJump(array, index)
    arrayJ.append(destinations[0])
-   print(arrayJ)
-
-
+   binValue = bin((arrayJ[0] << 26 | int(arrayJ[1])))
+   binValue = format32(binValue[2:])
+   binSave.append(binValue)
+   arrayI.clear()
+   
 
 if __name__ == '__main__':  
   util = Util()
@@ -218,8 +265,6 @@ if __name__ == '__main__':
     L+= 1
     fileWords.append("bk")
   
-    
-  print(labelList[1][0])
   
   for index, x in enumerate(fileWords):
     if x == "add":
@@ -313,7 +358,10 @@ if __name__ == '__main__':
       currentLine += 1
       TypeJ(3, fileWords, index)
                    
-        
+  binaryFile = open("binResponse.bin", "w")
+  for line in binSave:
+    binaryFile.write(line + "\n") 
+  binaryFile.close()
 
 
                
