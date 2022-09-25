@@ -13,6 +13,7 @@ fileRows = []
 fileWords = []
 arrayR = []
 arrayI = []
+arrayJ = []
 currentLine = 0
 
 def registrarChecker(array, index):
@@ -45,7 +46,6 @@ def registrarChecker3(array, index):
   labelAddress = 0
   while array[index] != 'bk':
     for x in util.registers:
-      print(array[index])
       if x == array[index]:
         x = x.replace("$", "")
         x = int(x)
@@ -53,8 +53,6 @@ def registrarChecker3(array, index):
         immediate = array[index+1] 
     index += 1
   while (len(labelList) - 1) >= i:
-    print(immediate)
-    print(labelList[i][0])
     if labelList[i][0] == immediate:
       labelAddress = labelList[i][1]
       print('currentLine', currentLine)
@@ -65,9 +63,49 @@ def registrarChecker3(array, index):
     i+=1
 
   destinations.append(int(immediate))
+  print(destinations)
   return destinations
-   
+
+def registrarCheckerLW_SW(array, index):
+  destinations = []
+
+  while array[index] != 'bk':
+    for x in util.registers:
+      if x == array[index]:
+        x = x.replace("$", "")
+        x = int(x)
+        destinations.append(x) 
+        rsAddress = array[index+1]
+    index += 1
   
+  rsAddress.split('(')
+  destinations.append(int(rsAddress[0])) 
+  rsAddress.split('$')
+  rsAddress.replace(')', "")
+  destinations.append(int(rsAddress[3]))
+
+  return destinations
+
+def toJump(array, index):
+  destinations = []
+  i = 0
+
+  while array[index] != 'bk':
+    label = array[index]
+    index += 1
+
+  while (len(labelList) - 1) >= i:
+    print(label)
+    print(labelList[i][0])
+    if labelList[i][0] == label:
+      labelAddress = labelList[i][1]
+      labelAddress = 0x00400000 + (labelAddress * 4)
+      destinations.append(labelAddress)
+      return destinations
+    i+=1
+  
+    
+
     
 def TypeR(id, array, index):
   
@@ -81,9 +119,9 @@ def TypeR(id, array, index):
     arrayR.append(id)
   elif id == 0 or id == 2:
     arrayR.append(0)
+    arrayR.append(0)
     destinations = registrarChecker2(array, index)
     arrayR.append(destinations[1])
-    arrayR.append(0)
     arrayR.append(destinations[0])
     arrayR.append(destinations[2])
     arrayR.append(id)
@@ -132,10 +170,36 @@ def TypeI(id, array, index):
     arrayI.append(destinations[0])
     arrayI.append(destinations[1])
     arrayI.append(destinations[2])
+  elif id == 8 or id == 9 or id == 10 or id == 11 or id == 12 or id == 13:
+    arrayI.append(id)
+    destinations = registrarChecker3(array, index)
+    arrayI.append(destinations[1])
+    arrayI.append(destinations[0])
+    arrayI.append(destinations[2])
+    print(arrayI)
+  elif id == 15:
+    arrayI.append(id)
+    arrayI.append(0)
+    destinations = registrarChecker3(array, index)
+    arrayI.append(destinations[0])
+    arrayI.append(destinations[1])
+    print(arrayI)
+  elif id == 35 or id == 43:
+    arrayI.append(id) 
+    destinations = registrarCheckerLW_SW(array, index)
+    arrayI.append(destinations[2])
+    arrayI.append(destinations[0])
+    arrayI.append(destinations[1])
     print(arrayI)
 
-def Typej(id, array, index):
-  print("aq")  
+
+def TypeJ(id, array, index):
+   arrayJ.append(id)
+   destinations = toJump(array, index)
+   arrayJ.append(destinations[0])
+   print(arrayJ)
+
+
 
 if __name__ == '__main__':  
   util = Util()
@@ -244,10 +308,10 @@ if __name__ == '__main__':
       TypeI(43, fileWords, index)
     elif x == "j":
       currentLine += 1
-      Typej(2, fileWords, index)
+      TypeJ(2, fileWords, index)
     elif x == "jal":
       currentLine += 1
-      Typej(3, fileWords, index)
+      TypeJ(3, fileWords, index)
                    
         
 
