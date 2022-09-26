@@ -1,4 +1,3 @@
-
 from array import array
 from cProfile import label
 from multiprocessing.dummy import current_process
@@ -9,7 +8,6 @@ from Utility import Util
 lineList = []
 labelLineList = []
 labelList = []
-fileRows = []
 fileWords = []
 arrayR = []
 arrayI = []
@@ -17,6 +15,7 @@ arrayJ = []
 binSave = []
 currentLine = 0
 
+#checar os registradores para cada comando que tem 3 registradores como padrão
 def registrarChecker(array, index):
   destinations = []
   while array[index] != 'bk':
@@ -28,6 +27,7 @@ def registrarChecker(array, index):
       index += 1
   return destinations
 
+#checar os registradores e a constante sa
 def registrarChecker2(array, index):
   destinations = []
   while array[index] != 'bk':
@@ -41,6 +41,7 @@ def registrarChecker2(array, index):
   destinations.append(int(sa))
   return destinations 
 
+#checar os registradores e se tem label ou uma constante na operação
 def registrarChecker3(array, index):
   destinations = []
   i = 0
@@ -56,6 +57,7 @@ def registrarChecker3(array, index):
   while (len(labelList) - 1) >= i:
     if labelList[i][0] == immediate:
       labelAddress = labelList[i][1]
+      #calculando immediate quando se tem uma label na operação
       immediate = (labelAddress + 1) - currentLine - 1
       destinations.append(immediate)
       return destinations
@@ -64,6 +66,7 @@ def registrarChecker3(array, index):
   destinations.append(int(immediate))
   return destinations
 
+#checando registradores LW e SW 
 def registrarCheckerLW_SW(array, index):
   destinations = []
 
@@ -84,6 +87,7 @@ def registrarCheckerLW_SW(array, index):
 
   return destinations
 
+#função que retorna a codificação de j e jal
 def toJump(array, index):
   destinations = []
   i = 0
@@ -100,19 +104,20 @@ def toJump(array, index):
       return destinations
     i+=1
   
-    
+#formata o binário para 32 bits  
 def format32(bin):
     r = len(bin)
     a = 32 - r
     return ("0"*a)+bin
 
+#caso o binário seja negativo irá precisar realizar a formatação de outra forma
 def negativeBin(n, bits):
   s = bin(n & int("1"*bits, 2))[2:]
 
   return ("{0:0>%s}" %(bits)).format(s)
-    
+
+#faz um array da codificação para instruções do tipo R    
 def TypeR(id, array, index):
-  
   if array[index] == "mul":
     arrayR.append(28)
     destinations = registrarChecker(array, index)
@@ -121,9 +126,10 @@ def TypeR(id, array, index):
     arrayR.append(destinations[0]) 
     arrayR.append(0)
     arrayR.append(id)
+    #transforma em binário
     binValue = bin((arrayR[0] << 26 | arrayR[1] << 21 | arrayR[2] << 16 | arrayR[3] << 11 | arrayR[4] << 6 | arrayR[5]))
     binValue = format32(binValue[2:])
-    binSave.append(binValue)
+    binSave.append(binValue) #array de binário da codificação
     arrayR.clear()
     
   elif id == 0 or id == 2:
@@ -189,9 +195,7 @@ def TypeR(id, array, index):
     arrayR.clear()
 
   
-
-  
-  
+ #faz um array da codificação para instruções do tipo I 
 def TypeI(id, array, index):
   if id == 4 or id == 5:
     destinations = registrarChecker3(array, index)
@@ -199,9 +203,9 @@ def TypeI(id, array, index):
     arrayI.append(destinations[0])
     arrayI.append(destinations[1])
     arrayI.append(destinations[2])
-    arrayI[3] = negativeBin(arrayI[3], 16)
-    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16))
-    binValue = binValue[2:15]+ arrayI[3]
+    arrayI[3] = negativeBin(arrayI[3], 16) #binário do número negativo em 16 bits
+    binValue = bin((arrayI[0] << 26 | arrayI[1] << 21 | arrayI[2] << 16)) #binário do restante da codificação em 16 bits
+    binValue = binValue[2:15]+ arrayI[3] #soma dos binários de 16 bits
     binValue = format32(binValue)
     binSave.append(binValue)
     arrayI.clear()
@@ -237,7 +241,7 @@ def TypeI(id, array, index):
     binSave.append(binValue)
     arrayI.clear()
 
-
+#faz um array da codificação para instruções do tipo J
 def TypeJ(id, array, index):
    arrayJ.append(id)
    destinations = toJump(array, index)
@@ -245,16 +249,16 @@ def TypeJ(id, array, index):
    binValue = bin((arrayJ[0] << 26 | int(arrayJ[1])))
    binValue = format32(binValue[2:])
    binSave.append(binValue)
-   arrayI.clear()
+   arrayJ.clear()
    
 
 if __name__ == '__main__':  
   util = Util()
   L = 0
+  #faz a primeira leitura do meu arquivo identificando a label e em qual endereço ela se encontra
   fileName = input("Nome do arquivo .asm: ")
   fileContent = open(fileName, 'r')
   for index, line in enumerate(fileContent):
-    fileRows.append(line)
     for word in line.split():
       word = word.replace(",", "")
       fileWords.append(word)
@@ -265,7 +269,7 @@ if __name__ == '__main__':
     L+= 1
     fileWords.append("bk")
   
-  
+  #checa qual o tipo de operação e chama a função do tipo que  ela pertence
   for index, x in enumerate(fileWords):
     if x == "add":
       currentLine += 1
@@ -357,7 +361,8 @@ if __name__ == '__main__':
     elif x == "jal":
       currentLine += 1
       TypeJ(3, fileWords, index)
-                   
+
+  #cria e escreve o arquivo binário                
   binaryFile = open("binResponse.bin", "w")
   for line in binSave:
     binaryFile.write(line + "\n") 
