@@ -79,11 +79,11 @@ def registrarCheckerLW_SW(array, index):
         rsAddress = array[index+1]
     index += 1
   
-  rsAddress.split('(')
+  rsAddress = rsAddress.split('(')
   destinations.append(int(rsAddress[0])) 
-  rsAddress.split('$')
-  rsAddress.replace(')', "")
-  destinations.append(int(rsAddress[3]))
+  rsAddress = rsAddress[1].split('$')
+  rsAddress = rsAddress[1].replace(')', "")
+  destinations.append(int(rsAddress[0]))
 
   return destinations
 
